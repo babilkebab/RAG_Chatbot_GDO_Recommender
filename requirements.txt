@@ -1,0 +1,6 @@
+asyncio
+fastapi
+***REMOVED***
+opentelemetry-api
+pydantic
+uvicorn
