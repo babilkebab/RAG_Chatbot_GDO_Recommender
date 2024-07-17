@@ -56,13 +56,14 @@ if __name__ == '__main__':
                 st.markdown(confirm.text)
                 st.session_state["submitted"] = True
 
-    if st.session_state["submitted"]:
-        prompt = st.chat_input("Scrivi qualcosa...")
-        if prompt:
-            with st.chat_message("user"):
-                st.markdown(prompt)
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                recommendation = get_recommendation(prompt)
-            with st.chat_message("assistant"):
-                st.write_stream(typewriting_effect(recommendation))
-                st.session_state.messages.append({"role": "assistant", "content": recommendation})
+    with st.spinner("Generazione della risposta..."):
+        if st.session_state["submitted"]:
+            prompt = st.chat_input("Scrivi qualcosa...")
+            if prompt:
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    recommendation = get_recommendation(prompt)
+                with st.chat_message("assistant"):
+                    st.write_stream(typewriting_effect(recommendation))
+                    st.session_state.messages.append({"role": "assistant", "content": recommendation})
