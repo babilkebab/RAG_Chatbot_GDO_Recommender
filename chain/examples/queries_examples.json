@@ -1,0 +1,38 @@
+{
+    "examples":[
+        {
+            "question": "Avendo comprato PRODUCT, consigliami dei prodotti correlati",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nWITH p2, [product IN p2.antecedents] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Partendo da \"PRODUCT NAME\", consigliami dei prodotti che appartengono unicamente alla categoria CAT1 (LIVELLO 2) oppure alla categoria CAT2 (LIVELLO 2)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)-[:`son of`]->(s:lv2Node)<-[:`son of`]-(o2:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nWHERE ANY (product IN s.antecedents WHERE product CONTAINS \"CAT1\" OR product CONTAINS \"CAT2\")\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE product CONTAINS \"CAT1\" OR product CONTAINS \"CAT2\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Partendo da \"PRODUCT NAME\", consigliami dei prodotti che appartengono unicamente alla categoria CAT1 (LIVELLO 3)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nWHERE ANY (product IN o.antecedents WHERE product CONTAINS \"CAT1\")\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE product CONTAINS \"CAT1\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Partendo da \"PRODUCT NAME\", consigliami dei prodotti che appartengono unicamente alla categoria CAT1 (LIVELLO 4)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)<-[:`son of`]-(p2:lv5Node)\nWHERE ANY (product IN m.antecedents WHERE product CONTAINS \"CAT1\")\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE product CONTAINS \"CAT1\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Considera il prodotto \"PRODUCT NAME\". Devi consigliare dei prodotti che non appartengono ne alla categoria CAT1 (LIVELLO 2) ne alla categoria CAT2 (LIVELLO 2)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)-[:`son of`]->(s:lv2Node)<-[:`son of`]-(o2:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE NOT product CONTAINS \"CAT1\" AND NOT product CONTAINS \"CAT2\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Considera il prodotto \"PRODUCT NAME\". Devi consigliare dei prodotti che non appartengono alla categoria CAT1 (LIVELLO 3)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)-[:`son of`]->(s:lv2Node)<-[:`son of`]-(o2:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE NOT product CONTAINS \"CAT1\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        },
+
+        {
+            "question": "Considera il prodotto \"PRODUCT NAME\". Devi consigliare dei prodotti che non appartengono alla categoria CAT1 (LIVELLO 4)",
+            "query"   : "MATCH (p:lv5Node)\nWHERE ANY (product IN p.antecedents WHERE product CONTAINS \"PRODUCT\" AND product CONTAINS \"NAME\")\nMATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)-[:`son of`]->(s:lv2Node)<-[:`son of`]-(o2:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)\nMATCH (p2)\nWITH p2, [product IN p2.antecedents WHERE NOT product CONTAINS \"CAT1\"] AS prodotti_lists\nWHERE p2 <> p AND SIZE(prodotti_lists) > 0\nUNWIND prodotti_lists AS prodotti_consigliati\nRETURN DISTINCT prodotti_consigliati"
+        }
+    ]
+}

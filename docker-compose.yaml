@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  chain:
+    build:
+      context: ./chain
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: chain
+    ports:
+      - 8090:8090
+    networks:
+      net1:
+        ipv4_address: 10.0.100.3
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: ui
+    ports:
+      - 8501:8501
+    depends_on:
+      - chain
+    networks:
+      net1:
+        ipv4_address: 10.0.100.4
+
+
+networks:
+  net1:
+    external: true
