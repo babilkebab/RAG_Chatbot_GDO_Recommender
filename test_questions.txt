@@ -1,0 +1,4 @@
+Partendo da "GRANAROLO", consigliami dei prodotti che appartengono unicamente alla categoria PROSCIUTTO COTTO (LIVELLO 4)
+Considera il prodotto "GRANAROLO". Devi consigliare dei prodotti che ASSOLUTAMENTE NON appartengono alla categoria PROSCIUTTO COTTO (LIVELLO 4)
+Partendo da "KINDER", consigliami dei prodotti che appartengono unicamente alle categorie SALUMI BANCO TAGLIO (LIVELLO 3) e PASTA DI SEMOLA (LIVELLO 3)
+Avendo comprato COCA COLA PET LT.1,5 (P), consigliami dei prodotti correlati
