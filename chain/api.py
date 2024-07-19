@@ -10,9 +10,10 @@ from CypherChain import CypherChain
 
 
 models_map = {
-    "GPT 3.5 Turbo": "gpt-3.5-turbo-0125",
+    "GPT 4o Mini": "gpt-4o-mini",
     "GPT 4 Turbo": "gpt-4-turbo",
     "GPT 4o": "gpt-4o",
+    "GPT 3.5 Turbo": "gpt-3.5-turbo-0125",
 }
 
 
