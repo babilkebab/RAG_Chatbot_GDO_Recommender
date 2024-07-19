@@ -48,7 +48,7 @@ if __name__ == '__main__':
             k = st.number_input("Inserisci il valore di k", min_value=0, max_value=int(NUM_OF_EXAMPLES), format="%d")
             model_option = st.selectbox(
                 "Quale modello vorresti utilizzare per generare la query?",
-                ("GPT 3.5 Turbo", "GPT 4 Turbo", "GPT 4o"),
+                ("GPT 3.5 Turbo", "GPT 4 Turbo", "GPT 4o", "GPT 4o Mini"),
             )
             submitted = st.form_submit_button("Conferma")
             if submitted:
