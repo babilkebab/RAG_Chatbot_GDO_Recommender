@@ -20,6 +20,8 @@ class CypherChain:
         self.k = k
         self.embedding = embedding
         examples = self._generate_multiquery(examples, numexpr)
+        examples = self._generate_multilevel(examples)
+        logger.info(examples)
         self.selector = QueryExampleSelector(examples, self.k, self.embedding)
         self.chat_history = []
 
@@ -33,9 +35,35 @@ class CypherChain:
             new_questions = gen.generate_queries(question, numexpr)
             for new_question in new_questions:
                 new_examples.append({"question": new_question, "query": example["query"]})
-        logger.info(new_examples)
         return new_examples
-        
+    
+    def _generate_multilevel(self, examples):
+        new_examples = []
+        for example in examples:
+            level_tags = ["SECOND 2ND", "THIRD 3RD", "FOURTH 4TH"]
+            level_tags_it = ["LIVELLO 2", "LIVELLO 3", "LIVELLO 4"]
+            chain_tags = ["MATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)-[:`son of`]->(s:lv2Node)<-[:`son of`]-(o2:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)",
+                          "MATCH (p)-[:`son of`]->(m:lv4Node)-[:`son of`]->(o:lv3Node)<-[:`son of`]-(m2:lv4Node)<-[:`son of`]-(p2:lv5Node)",
+                          "MATCH (p)-[:`son of`]->(m:lv4Node)<-[:`son of`]-(p2:lv5Node)"]
+            nodes_names = ["s.ant", "o.ant", "m.ant"]
+            tags = re.findall('\*\*\*(.*?)\*\*\*', example["question"])
+            if not tags:
+                continue
+            tags_it = re.findall('\((.*?)\)', example["question"])
+            query_splitted = example["query"].split("\n")
+            index = level_tags.index(tags[0])
+            level_tags.pop(index)
+            level_tags_it.pop(index)
+            chain_tags.pop(index)
+            nodes_names.pop(index)
+            new_examples.append(example)
+            for i in range(len(level_tags)):
+                new_question = (example["question"].replace(tags[0], level_tags[i])).replace(tags_it[0], level_tags_it[i])
+                #sostituisco terza e quarta linea della query (collegamenti tra i nodi) con i livelli giusti
+                fourth_line = re.sub("[a-z].ant", nodes_names[i], query_splitted[3])
+                new_query = (example["query"].replace(query_splitted[2], chain_tags[i])).replace(query_splitted[3], fourth_line)
+                new_examples.append({"question": new_question, "query": new_query})
+        return new_examples
                 
 
     def _generate_prompts(self, question):

@@ -16,11 +16,11 @@ def flag_negs(text):
 
 def flag_level(text):
     if "livello 2" in text.lower():
-        return "***SECOND LEVEL*** " + text + " ***SECOND LEVEL***"
+        return "***SECOND 2ND*** " + text + " ***SECOND 2ND***"
     elif "livello 3" in text.lower():
-        return "***THIRD LEVEL*** " + text + " ***THIRD LEVEL***"
+        return "***THIRD 3RD*** " + text + " ***THIRD 3RD***"
     elif "livello 4" in text.lower():
-        return "***FOURTH LEVEL*** " + text + " ***FOURTH LEVEL***"
+        return "***FOURTH 4TH*** " + text + " ***FOURTH 4TH***"
     return text
 
 models_map = {
