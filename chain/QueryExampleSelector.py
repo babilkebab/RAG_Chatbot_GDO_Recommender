@@ -29,4 +29,3 @@ class QueryExampleSelector:
         return str_prompt
 
 
-

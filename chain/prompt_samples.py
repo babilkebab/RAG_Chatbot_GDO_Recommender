@@ -82,3 +82,27 @@ RESPONSER_CONTEXT_TEMPLATE = """
 
 
 """
+
+
+def multiquery_template(num_expr):
+    return """
+
+        Sei un assistente IA che, partendo da una espressione in linguaggio naturale, genera una serie di espressioni in linguaggio naturale simili a quella iniziale.
+        Le espressioni generate devono essere simili a quella iniziale, ma non devono essere identiche. Devono avere lo stesso significato semantico.
+        Le espressioni generate devono essere in lingua italiana e devono essere grammaticalmente corrette.
+        Le espressioni generate devono essere pertinenti al contesto della domanda iniziale.
+        Non devi includere alcun testo oltre alle espressioni generate.
+
+        """ + f"""
+        Dovrai generare esattamente {num_expr} espressioni
+        """ + """ tutte diverse tra loro, composte in modo da essere ognuna un singolo periodo. Ogni periodo deve terminare con un punto.
+            Genera la risposta separando le espressioni con un doppio a capo.
+            Ciò che è contenuto tra apici singoli non deve essere modificato. 
+            Esempio: Se la domanda iniziale è "Qual è il tuo 'nome'?", le espressioni generate potrebbero essere: "Dimmi il tuo nome", "Potresti dirmi il tuo nome?".
+
+            Ciò che è contenuto tra tripli asterischi non deve essere modificato.
+            Esempio: Se la domanda iniziale è "***EXPR*** Qual è il tuo 'nome'?", le espressioni generate potrebbero essere: "***EXPR*** Dimmi il tuo nome", "***EXPR*** Potresti dirmi il tuo nome?".
+
+            L'espressione iniziale è: {question}
+
+        """

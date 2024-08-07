@@ -3,6 +3,7 @@ import re
 from langchain_core.messages import HumanMessage, AIMessage
 from PromptGenerator import CypherPromptGenerator, ResponserPromptGenerator
 from QueryExampleSelector import QueryExampleSelector
+from MultiQueryGenerator import MultiQueryGenerator
 
 
 
@@ -10,15 +11,30 @@ logger = logging.getLogger("uvicorn")
 
 
 class CypherChain:
-    def __init__(self, examples, chat_model, qa_model, graph, k, embedding):
+    def __init__(self, examples, chat_model, qa_model, multiquery_model, graph, k, embedding, numexpr):
         self.chat_model = chat_model
         self.qa_model = qa_model
+        self.multiquery_model = multiquery_model
         self.graph = graph
         self.schema = graph.structured_schema
         self.k = k
         self.embedding = embedding
+        examples = self._generate_multiquery(examples, numexpr)
         self.selector = QueryExampleSelector(examples, self.k, self.embedding)
         self.chat_history = []
+
+
+    def _generate_multiquery(self, examples, numexpr):
+        gen = MultiQueryGenerator(self.multiquery_model)
+        new_examples = []
+        for example in examples:
+            new_examples.append(example)
+            question = example["question"]
+            new_questions = gen.generate_queries(question, numexpr)
+            for new_question in new_questions:
+                new_examples.append({"question": new_question, "query": example["query"]})
+        logger.info(new_examples)
+        return new_examples
         
                 
 
