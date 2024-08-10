@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from PromptGenerator import CypherPromptGenerator, ResponserPromptGenerator
 from QueryExampleSelector import QueryExampleSelector
 from MultiQueryGenerator import MultiQueryGenerator
+from QueryOptimizer import QueryOptimizer
 
 
 
@@ -11,18 +12,19 @@ logger = logging.getLogger("uvicorn")
 
 
 class CypherChain:
-    def __init__(self, examples, chat_model, qa_model, multiquery_model, graph, k, embedding, numexpr):
+    def __init__(self, examples, chat_model, qa_model, multiquery_model, query_opt_model, graph, k, embedding, numexpr):
         self.chat_model = chat_model
         self.qa_model = qa_model
         self.multiquery_model = multiquery_model
+        self.optimizer = QueryOptimizer(query_opt_model)
         self.graph = graph
         self.schema = graph.structured_schema
         self.k = k
         self.embedding = embedding
-        examples = self._generate_multiquery(examples, numexpr)
-        examples = self._generate_multilevel(examples)
-        logger.info(examples)
-        self.selector = QueryExampleSelector(examples, self.k, self.embedding)
+        optimized_examples = self._optimize_examples(examples)
+        flagged_examples = self._flag_examples(optimized_examples)
+        final_examples = self._generate_multilevel(self._generate_multiquery(flagged_examples, numexpr))
+        self.selector = QueryExampleSelector(final_examples, self.k, self.embedding)
         self.chat_history = []
 
 
@@ -36,6 +38,29 @@ class CypherChain:
             for new_question in new_questions:
                 new_examples.append({"question": new_question, "query": example["query"]})
         return new_examples
+    
+    def _flag_examples(self, examples):
+        new_examples = []
+        for example in examples:
+            new_examples.append({"question": self._flagger(example["question"]), "query": example["query"]})
+        return new_examples
+    
+    def _flagger(self, question):
+        def flag_negs(text):
+            if "non" in text.lower():
+                return "***NEGATION*** " + text + " ***NEGATION***"
+            return text
+
+        def flag_level(text):
+            if "livello 2" in text.lower():
+                return "***SECOND 2ND*** " + text + " ***SECOND 2ND***"
+            elif "livello 3" in text.lower():
+                return "***THIRD 3RD*** " + text + " ***THIRD 3RD***"
+            elif "livello 4" in text.lower():
+                return "***FOURTH 4TH*** " + text + " ***FOURTH 4TH***"
+            return text
+        
+        return flag_level(flag_negs(question))
     
     def _generate_multilevel(self, examples):
         new_examples = []
@@ -64,6 +89,11 @@ class CypherChain:
                 new_query = (example["query"].replace(query_splitted[2], chain_tags[i])).replace(query_splitted[3], fourth_line)
                 new_examples.append({"question": new_question, "query": new_query})
         return new_examples
+    
+    def _optimize_examples(self, examples):
+        for example in examples:
+            example["question"] = self.optimizer.optimize(example["question"])
+        return examples
                 
 
     def _generate_prompts(self, question):
@@ -110,20 +140,24 @@ class CypherChain:
 
     async def ainvoke(self, question):
 
-        self._generate_chain(question)
+        opt_question = self.optimizer.optimize(question)
+        flagged_question = self._flagger(opt_question)
+        logger.info(flagged_question)
+
+        self._generate_chain(flagged_question)
 
         invoke_input = {
-            "question"     : question,
+            "question"     : flagged_question,
             "schema"       : self.schema,
             "chat_history" : self.chat_history,
         }
         cypher_query = await self._gen_cypher_query(invoke_input)
         context = self._query_executor(cypher_query)
-        qa_answer = await self._gen_qa_answer(question, context)
+        qa_answer = await self._gen_qa_answer(flagged_question, context)
 
         self.chat_history.extend(
                 [
-                    HumanMessage(content=question),
+                    HumanMessage(content=flagged_question),
                     AIMessage(content=qa_answer.content)
                 ]
             )

@@ -14,7 +14,8 @@ class QueryExampleSelector:
 
     def _conf_vectorstore(self):
         chroma_client = chromadb.Client()
-        self.collection = chroma_client.get_or_create_collection(name="examples", embedding_function=self.embedding)
+        self.collection = chroma_client.get_or_create_collection(name="examples", embedding_function=self.embedding, metadata={"hnsw:space": "cosine"})
+        logger.info(self.examples)
         self.collection.add(
             documents=[doc for doc in self.examples.keys()],
             ids=[f"id{i}" for i in range(len(self.examples.keys()))],

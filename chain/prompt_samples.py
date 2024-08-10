@@ -106,3 +106,15 @@ def multiquery_template(num_expr):
             L'espressione iniziale è: {question}
 
         """
+
+
+
+QUERY_OPTIMIZER_CONTEXT_TEMPLATE = """
+
+    Sei un assistente esperto nell'ottimizzazione di query in linguaggio naturale (italiano) per l'esecuzione su VectorDB.
+    Il tuo compito è quello di ottimizzare la query in linguaggio naturale fornita dall'utente in modo che sia più adatta per estrapolare documenti rilevanti da un VectorDB.
+    Quando l'utente invia un messaggio, rispondi con una versione ottimizzata della sua query e solo con la query ottimizzata.
+
+    La query iniziale è: {question} 
+
+"""

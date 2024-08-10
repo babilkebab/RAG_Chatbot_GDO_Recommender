@@ -1,5 +1,5 @@
 from   abc import abstractmethod
-from prompt_samples import CYPHER_CONTEXT_TEMPLATE, RESPONSER_CONTEXT_TEMPLATE, multiquery_template
+from prompt_samples import CYPHER_CONTEXT_TEMPLATE, RESPONSER_CONTEXT_TEMPLATE, multiquery_template, QUERY_OPTIMIZER_CONTEXT_TEMPLATE
 from   langchain_core.prompts  import (
        ChatPromptTemplate,
        PromptTemplate,
@@ -70,4 +70,15 @@ class MultiQueryPromptGenerator(PromptGenerator):
 
         return PromptTemplate(
             input_variables=["question"], template=MULTIQUERY_GEN_CONTEXT_TEMPLATE
+        )
+    
+
+class QueryOptimizerPromptGenerator(PromptGenerator):
+    def __init__(self, examples=None):
+        super().__init__(examples)
+    
+    def prompt(self):
+        
+        return PromptTemplate(
+            input_variables=["question"], template=QUERY_OPTIMIZER_CONTEXT_TEMPLATE
         )

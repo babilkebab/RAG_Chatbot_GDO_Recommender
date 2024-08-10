@@ -9,20 +9,6 @@ from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 from CypherChain import CypherChain
 
 
-def flag_negs(text):
-    if "non" in text.lower():
-        return "***NEGATION*** " + text + " ***NEGATION***"
-    return text
-
-def flag_level(text):
-    if "livello 2" in text.lower():
-        return "***SECOND 2ND*** " + text + " ***SECOND 2ND***"
-    elif "livello 3" in text.lower():
-        return "***THIRD 3RD*** " + text + " ***THIRD 3RD***"
-    elif "livello 4" in text.lower():
-        return "***FOURTH 4TH*** " + text + " ***FOURTH 4TH***"
-    return text
-
 models_map = {
     "GPT 4o Mini": "gpt-4o-mini",
     "GPT 4 Turbo": "gpt-4-turbo",
@@ -58,6 +44,7 @@ examples_2 = json.load(open("examples/queries_examples.json"))["examples"]
 
 qa_model = ChatOpenAI(model=MODEL, temperature=0.5)
 multiquery_model = ChatOpenAI(model=MODEL, temperature=0.1)
+optimizer_model = ChatOpenAI(model=MODEL, temperature=0)
 
 @app.get("/chain_settings")
 async def set_chain_settings(k: int, model: str):
@@ -66,7 +53,7 @@ async def set_chain_settings(k: int, model: str):
     chat_model = ChatOpenAI(model=models_map[model], temperature=0)
     k_param = k
     numexpr = k-1
-    chain = CypherChain(examples_2, chat_model, qa_model, multiquery_model, graph, k_param, OpenAIEmbeddingFunction(api_key=OPENAI_API_KEY, model_name="text-embedding-3-small"), numexpr)
+    chain = CypherChain(examples_2, chat_model, qa_model, multiquery_model, optimizer_model, graph, k_param, OpenAIEmbeddingFunction(api_key=OPENAI_API_KEY, model_name="text-embedding-3-small"), numexpr)
     return "Confermato!"
 
 
@@ -74,7 +61,6 @@ async def set_chain_settings(k: int, model: str):
 
 @app.get("/query")
 async def get_answer(question: str):
-    question = flag_level(flag_negs(question))
     logger.info(question)
     response = await chain.ainvoke(question)
     return response

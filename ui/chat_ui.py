@@ -52,9 +52,10 @@ if __name__ == '__main__':
             )
             submitted = st.form_submit_button("Conferma")
             if submitted:
-                confirm = set_chain_settings(k, model_option)
-                st.markdown(confirm.text)
-                st.session_state["submitted"] = True
+                with st.spinner("Configurazione del modello..."):
+                    confirm = set_chain_settings(k, model_option)
+                    st.markdown(confirm.text)
+                    st.session_state["submitted"] = True
 
     with st.spinner("Generazione della risposta..."):
         if st.session_state["submitted"]:
